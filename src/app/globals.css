@@ -8,8 +8,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-sans-serif: "dorival-ui-variable", sans-serif;
+  --color-ink: #121317;
+  --font-sans: var(--font-google-sans-flex);
+  --font-sans-serif: var(--font-google-sans);
   --font-mono: var(--font-geist-mono);
 }
 

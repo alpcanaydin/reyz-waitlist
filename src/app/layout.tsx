@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
 
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Google_Sans, Google_Sans_Flex } from 'next/font/google';
 
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const googleSans = Google_Sans({
+  variable: '--font-google-sans',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const googleSansFlex = Google_Sans_Flex({
+  variable: '--font-google-sans-flex',
   subsets: ['latin'],
 });
 
@@ -26,10 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="stylesheet" href="https://use.typekit.net/riw6kui.css" />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${googleSans.variable} ${googleSansFlex.variable} antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }
