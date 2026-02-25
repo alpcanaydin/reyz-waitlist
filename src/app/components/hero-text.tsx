@@ -15,7 +15,7 @@ const PAUSE_AFTER_MENTION = 1000;
 const MENTION_COLOR = '#912E9E';
 const INK_COLOR = '#121317';
 
-export default function HeroText() {
+export default function HeroText({ onComplete }: { onComplete?: () => void }) {
   const [revealed, setRevealed] = useState(0);
   const [cursorColor, setCursorColor] = useState(MENTION_COLOR);
   const [showCursor, setShowCursor] = useState(true);
@@ -35,7 +35,10 @@ export default function HeroText() {
         const delay = SPEED + (Math.random() * JITTER * 2 - JITTER);
         timeoutRef.current = setTimeout(step, delay);
       } else {
-        timeoutRef.current = setTimeout(() => setShowCursor(false), 200);
+        timeoutRef.current = setTimeout(() => {
+          setShowCursor(false);
+          onComplete?.();
+        }, 200);
       }
     }
 
