@@ -1,12 +1,19 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import type { SubmitEvent } from 'react';
 
-export default function WaitlistForm() {
+import { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
+
+interface Props {
+  className?: string;
+}
+
+export default function WaitlistForm({ className }: Props) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     if (!email) return;
     console.log('Waitlist signup:', email);
@@ -15,7 +22,7 @@ export default function WaitlistForm() {
 
   if (submitted) {
     return (
-      <p className="mt-8 text-center text-lg text-ink/70 font-sans-serif">
+      <p className={twMerge('text-center text-lg text-ink/70 font-sans-serif', className)}>
         Thanks! We&apos;ll be in touch.
       </p>
     );
@@ -24,7 +31,7 @@ export default function WaitlistForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-8 flex items-center justify-center px-4"
+      className={twMerge('flex items-center justify-center px-4', className)}
     >
       <div className="flex h-14 items-center rounded-full border border-ink/10 bg-white/60 backdrop-blur-sm pl-5 pr-1.5">
         <input
@@ -33,7 +40,7 @@ export default function WaitlistForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@company.com"
-          className="w-64 bg-transparent text-base text-ink placeholder:text-ink/40 outline-none font-sans-serif"
+          className="w-72 bg-transparent text-base text-ink placeholder:text-ink/40 outline-none font-sans-serif"
         />
         <button
           type="submit"

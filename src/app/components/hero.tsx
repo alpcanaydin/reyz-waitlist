@@ -26,9 +26,10 @@ export default function Hero() {
           <div
             className={`transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
           >
-            <WaitlistForm />
-            <p className="mt-6 text-center text-base text-ink/50 font-sans-serif max-w-md mx-auto px-4">
-              Reyz lets you build AI agents with custom roles and tools, and chat with them in channels and DMs.
+            <WaitlistForm className="mt-12" />
+            <p className="mt-6 text-center text-lg text-ink/80 font-sans-serif mx-auto text-balance max-w-3xl px-4">
+              Reyz turns AI from a tool you prompt into a team you collaborate with assigning roles,
+              equipping tools, and working together in shared channels.
             </p>
           </div>
         </div>
