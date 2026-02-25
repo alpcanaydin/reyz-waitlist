@@ -260,11 +260,17 @@ export default function CollaborativeCursors({ enabled }: { enabled: boolean }) 
 
       CURSORS.forEach((cursor, i) => {
         const target = getCursorTarget(cursor, i, mousePos.current, bounds, motionState);
-        const speedFactor =
-          cursor.name === 'You'
-            ? 1
-            : clamp(0.95 + motionState.intensity * 1.35 + motionState.panic * 1.1, 0.95, 3.1);
         const pos = cursorPositions.current[i];
+        if (cursor.name === 'You') {
+          pos.x = target.x;
+          pos.y = target.y;
+          return;
+        }
+        const speedFactor = clamp(
+          0.95 + motionState.intensity * 1.35 + motionState.panic * 1.1,
+          0.95,
+          3.1,
+        );
         pos.x += (target.x - pos.x) * cursor.speed * speedFactor;
         pos.y += (target.y - pos.y) * cursor.speed * speedFactor;
       });
