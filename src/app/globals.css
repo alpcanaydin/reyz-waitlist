@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
@@ -29,6 +29,23 @@ body {
 
 @utility font-condensed {
   font-variation-settings:
-    "wdth" 80,
-    "slnt" 0;
+    'wdth' 80,
+    'slnt' 0;
+}
+
+.typewriter-cursor {
+  position: absolute;
+  left: 0;
+  top: 0.13em;
+  width: 0.08em;
+  height: 0.85em;
+  background-color: var(--cursor-color, #912e9e);
+  animation: cursor-blink 530ms steps(2, start) infinite;
+  pointer-events: none;
+}
+
+@keyframes cursor-blink {
+  to {
+    visibility: hidden;
+  }
 }

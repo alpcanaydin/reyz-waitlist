@@ -590,11 +590,11 @@ export default function GradientCanvas() {
       fragment: fragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uColor1: { value: new Vec3(1.0, 1.0, 1.0) },
-        uColor2: { value: new Vec3(0.847, 0.816, 0.902) },
-        uColor3: { value: new Vec3(1.0, 1.0, 1.0) },
-        uColor4: { value: new Vec3(1.0, 1.0, 1.0) },
-        uColor5: { value: new Vec3(0.973, 0.918, 0.875) },
+        uColor1: { value: new Vec3(0.965, 0.937, 1.0) },
+        uColor2: { value: new Vec3(0.988, 0.878, 0.996) },
+        uColor3: { value: new Vec3(0.694, 0.894, 0.984) },
+        uColor4: { value: new Vec3(0.843, 0.98, 1.0) },
+        uColor5: { value: new Vec3(1.0, 0.914, 0.976) },
         uNoiseStrength: { value: 0.09 },
         uMode: { value: 0 },
       },
@@ -603,12 +603,15 @@ export default function GradientCanvas() {
     const mesh = new Mesh(gl, { geometry, program });
 
     function resize() {
-      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      renderer.setSize(
+        containerRef.current?.clientWidth ?? 0,
+        containerRef.current?.clientHeight ?? 0,
+      );
     }
     window.addEventListener('resize', resize);
     resize();
 
-    let animateId;
+    let animateId: number;
     let time = 0;
     const speed = 1;
     function update() {
@@ -622,7 +625,10 @@ export default function GradientCanvas() {
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animateId);
-      containerRef.current?.removeChild(gl.canvas);
+      if (containerRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        containerRef.current.removeChild(gl.canvas);
+      }
     };
   }, []);
 

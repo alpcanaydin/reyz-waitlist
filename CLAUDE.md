@@ -1,0 +1,3 @@
+# Instructions
+
+- Use always pnpm.
