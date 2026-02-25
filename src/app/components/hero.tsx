@@ -18,13 +18,13 @@ export default function Hero() {
       <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none">
         <div className="pointer-events-auto">
           <div
-            className={`transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
+            className={`transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
           >
             <Image src="/icon.svg" alt="Reyz.ai" width={90} height={90} className="mb-8 mx-auto" />
           </div>
           <HeroText onComplete={() => setTypewriterDone(true)} />
           <div
-            className={`transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
+            className={`transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
           >
             <WaitlistForm className="mt-12" />
             <p className="mt-6 text-center text-lg text-ink/80 font-sans-serif mx-auto text-balance max-w-3xl px-4">
