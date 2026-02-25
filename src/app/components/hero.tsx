@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 import Background from './background';
+import CollaborativeCursors from './collaborative-cursors';
 import Header from './header';
 import HeroText from './hero-text';
 import WaitlistForm from './waitlist-form';
@@ -14,6 +15,7 @@ export default function Hero() {
   return (
     <div className="absolute inset-0">
       <Background />
+      <CollaborativeCursors enabled={typewriterDone} />
       <Header />
       <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none">
         <div className="pointer-events-auto">

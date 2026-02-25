@@ -15,7 +15,11 @@ const PAUSE_AFTER_MENTION = 1000;
 const MENTION_COLOR = '#912E9E';
 const INK_COLOR = '#121317';
 
-export default function HeroText({ onComplete }: { onComplete?: () => void }) {
+interface HeroTextProps {
+  onComplete?: () => void;
+}
+
+export default function HeroText({ onComplete }: HeroTextProps) {
   const [revealed, setRevealed] = useState(0);
   const [cursorColor, setCursorColor] = useState(MENTION_COLOR);
   const [showCursor, setShowCursor] = useState(true);
@@ -46,7 +50,7 @@ export default function HeroText({ onComplete }: { onComplete?: () => void }) {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, []);
+  }, [onComplete]);
 
   const chars = FULL_TEXT.split('');
   const done = revealed >= chars.length;

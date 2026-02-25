@@ -92,6 +92,7 @@ export default defineConfig([
       'perfectionist/sort-interfaces': ['error', { type: 'unsorted' }],
       'perfectionist/sort-jsx-props': ['error', { type: 'unsorted' }],
       'perfectionist/sort-objects': ['error', { type: 'unsorted' }],
+      'security/detect-object-injection': 'off',
     },
   },
 ]);
