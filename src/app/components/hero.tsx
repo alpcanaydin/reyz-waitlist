@@ -7,17 +7,21 @@ import Background from './background';
 import CollaborativeCursors from './collaborative-cursors';
 import Header from './header';
 import HeroText from './hero-text';
+import ReyzDemoWindow from './reyz-demo-window';
 import WaitlistForm from './waitlist-form';
 
 export default function Hero() {
   const [typewriterDone, setTypewriterDone] = useState(false);
 
   return (
-    <div className="absolute inset-0">
-      <Background />
+    <div className="relative">
+      <div className="fixed inset-0 -z-10">
+        <Background />
+      </div>
       <CollaborativeCursors enabled={typewriterDone} />
       <Header />
-      <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none">
+      {/* Hero text — centered with padding */}
+      <div className="relative flex flex-col items-center pt-28 pb-8 pointer-events-none">
         <div className="pointer-events-auto">
           <div
             className={`transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
@@ -35,6 +39,13 @@ export default function Hero() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Demo window — immediately after description */}
+      <div
+        className={`mt-8 transition-all duration-700 ease-out ${typewriterDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+      >
+        <ReyzDemoWindow />
       </div>
     </div>
   );

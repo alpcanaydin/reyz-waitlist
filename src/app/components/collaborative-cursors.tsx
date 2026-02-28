@@ -30,21 +30,21 @@ interface MotionState {
 const CURSORS: CursorConfig[] = [
   { name: 'You', color: '#22c55e', speed: 0.15, entranceDelay: 0, offset: { x: 0, y: 0 } },
   {
-    name: 'Backend Agent',
+    name: 'PM Agent',
     color: '#3b82f6',
     speed: 0.1,
     entranceDelay: 80,
     offset: { x: 28, y: 20 },
   },
   {
-    name: 'Frontend Agent',
+    name: 'Dev Agent',
     color: '#a855f7',
     speed: 0.07,
     entranceDelay: 160,
     offset: { x: -24, y: 35 },
   },
   {
-    name: 'DevOps Agent',
+    name: 'QA Agent',
     color: '#f97316',
     speed: 0.05,
     entranceDelay: 240,
@@ -146,6 +146,16 @@ export default function CollaborativeCursors({ enabled }: { enabled: boolean }) 
         clientY <= rect.bottom;
 
       if (!isInsideHero) {
+        hideCustomCursor();
+        updateSystemCursor(false);
+        return;
+      }
+
+      // Hide cursors when hovering over elements marked with data-hide-cursors
+      const overHideCursors = document
+        .elementsFromPoint(clientX, clientY)
+        .some((el) => el.hasAttribute('data-hide-cursors') || !!el.closest('[data-hide-cursors]'));
+      if (overHideCursors) {
         hideCustomCursor();
         updateSystemCursor(false);
         return;
