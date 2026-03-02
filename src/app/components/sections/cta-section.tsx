@@ -29,7 +29,7 @@ export default function CTASection() {
       <div
         className={`mx-auto max-w-3xl text-center transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
       >
-        <h2 className="text-4xl font-sans-serif tracking-tight text-ink md:text-5xl lg:text-6xl">
+        <h2 className="text-4xl font-sans-serif tracking-tight text-white md:text-5xl lg:text-6xl">
           Your AI team is ready.
         </h2>
         <p className="mt-3 text-lg text-white/60 font-sans-serif">
