@@ -37,12 +37,12 @@ export default function DemoMessage({
       currentStep += 1;
       setReactionStep(currentStep);
       if (currentStep < totalReactionSteps) {
-        const timer = setTimeout(incrementNext, 180);
+        const timer = setTimeout(incrementNext, 140);
         timers.add(timer);
       }
     };
 
-    const firstTimer = setTimeout(incrementNext, 120);
+    const firstTimer = setTimeout(incrementNext, 80);
     timers.add(firstTimer);
 
     return () => {
@@ -66,7 +66,7 @@ export default function DemoMessage({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-1.5">
-          <span className="text-sm font-semibold">{user.name}</span>
+          <span className="text-sm font-semibold text-gray-900">{user.name}</span>
           {user.isAgent && <span className="text-xs leading-none">{'\u{1F916}'}</span>}
           {hasAgentBadge && (
             <span
@@ -79,7 +79,7 @@ export default function DemoMessage({
           <span className="ml-auto text-xs text-gray-400 tabular-nums">{message.timestamp}</span>
         </div>
 
-        <p className="text-sm leading-relaxed">{message.text}</p>
+        <p className="mt-0.5 text-sm leading-relaxed text-gray-700">{message.text}</p>
 
         {message.card && <EmbeddedCardView card={message.card} />}
 
@@ -88,7 +88,7 @@ export default function DemoMessage({
             {message.reactions.map((reaction, i) => (
               <span
                 key={reaction.emoji}
-                className="inline-flex items-center gap-1 rounded-full bg-black/4 px-2 py-0.5 text-xs animate-reaction-pop"
+                className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 text-xs animate-reaction-pop"
                 style={{ animationDelay: `${i * 200}ms` }}
               >
                 {reaction.emoji} {reactionCounts[i] ?? reaction.users.length}
@@ -158,7 +158,7 @@ function EmbeddedCardView({ card }: { card: EmbeddedCard }) {
     <div className="mt-2 flex items-start gap-2.5 rounded-lg border border-gray-200 bg-gray-50/80 p-3">
       <CardIcon card={card} />
       <div className="min-w-0">
-        <p className="text-sm font-semibold">{card.title}</p>
+        <p className="text-sm font-semibold text-gray-800">{card.title}</p>
         <p className="text-xs text-gray-500">{card.subtitle}</p>
       </div>
     </div>

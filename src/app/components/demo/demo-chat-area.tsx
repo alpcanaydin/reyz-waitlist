@@ -94,6 +94,7 @@ export default function DemoChatArea({
 
     let currentIndex = 0;
     const timers = new Set<ReturnType<typeof setTimeout>>();
+    const scaleDelay = (delay: number, minimum = 0) => Math.max(minimum, Math.round(delay * 0.84));
     const schedule = (fn: () => void, delay: number) => {
       const timer = setTimeout(() => {
         timers.delete(timer);
@@ -105,7 +106,10 @@ export default function DemoChatArea({
 
     const composeOwnMessage = (text: string, pauseAfter: number, typingDuration: number) => {
       let charIndex = 0;
-      const perCharDelay = Math.max(18, Math.floor(typingDuration / Math.max(text.length, 1)));
+      const perCharDelay = Math.max(
+        14,
+        Math.floor(scaleDelay(typingDuration, 240) / Math.max(text.length, 1)),
+      );
 
       setTypingUserId(null);
       setIsInputTyping(true);
@@ -113,13 +117,16 @@ export default function DemoChatArea({
 
       const typeNextCharacter = () => {
         if (charIndex >= text.length) {
-          schedule(() => {
-            setIsInputTyping(false);
-            setInputDraft('');
-            currentIndex++;
-            setVisibleAnimatedCount(currentIndex);
-            schedule(showNext, pauseAfter);
-          }, 220);
+          schedule(
+            () => {
+              setIsInputTyping(false);
+              setInputDraft('');
+              currentIndex++;
+              setVisibleAnimatedCount(currentIndex);
+              schedule(showNext, scaleDelay(pauseAfter, 220));
+            },
+            scaleDelay(220, 140),
+          );
           return;
         }
 
@@ -131,16 +138,19 @@ export default function DemoChatArea({
         );
       };
 
-      schedule(typeNextCharacter, Math.min(80, perCharDelay));
+      schedule(typeNextCharacter, Math.min(scaleDelay(80, 30), perCharDelay));
     };
 
     function showNext() {
       if (!animated || currentIndex >= animated.length) {
         setTypingUserId(null);
-        schedule(() => {
-          setShowReactions(true);
-          onAnimationComplete();
-        }, 500);
+        schedule(
+          () => {
+            setShowReactions(true);
+            onAnimationComplete();
+          },
+          scaleDelay(500, 260),
+        );
         return;
       }
 
@@ -153,18 +163,21 @@ export default function DemoChatArea({
 
       // Phase 1: Show typing indicator
       setTypingUserId(msg.userId);
-      schedule(() => {
-        // Phase 2: Reveal message
-        setTypingUserId(null);
-        currentIndex++;
-        setVisibleAnimatedCount(currentIndex);
+      schedule(
+        () => {
+          // Phase 2: Reveal message
+          setTypingUserId(null);
+          currentIndex++;
+          setVisibleAnimatedCount(currentIndex);
 
-        // Phase 3: Pause then next
-        schedule(showNext, msg.pauseAfter);
-      }, msg.typingDuration);
+          // Phase 3: Pause then next
+          schedule(showNext, scaleDelay(msg.pauseAfter, 220));
+        },
+        scaleDelay(msg.typingDuration, 260),
+      );
     }
 
-    schedule(showNext, 160);
+    schedule(showNext, scaleDelay(160, 90));
 
     return () => {
       timers.forEach((timer) => clearTimeout(timer));

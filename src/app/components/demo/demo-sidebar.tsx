@@ -101,7 +101,7 @@ export default function DemoSidebar({
               active={activeView === channel.id}
               onClick={() => onViewChange(channel.id)}
             >
-              <span className="font-mono text-xs text-gray-400">#</span>
+              <span className="font-mono text-xs">#</span>
               <span className="truncate">{channel.name}</span>
             </SidebarItem>
           ))}
