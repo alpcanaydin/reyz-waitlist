@@ -56,7 +56,7 @@ export default function HeroText({ onComplete }: HeroTextProps) {
   const done = revealed >= chars.length;
 
   return (
-    <h1 className="text-center w-full max-w-5xl px-4 font-sans-serif tracking-tight leading-[1.1] text-7xl text-ink">
+    <h1 className="text-center w-full max-w-5xl px-4 font-sans-serif tracking-tight leading-[1.1] text-4xl md:text-6xl lg:text-7xl text-ink">
       {chars.map((char, i) => {
         const hasCursor = showCursor && i === revealed && !done;
         return (

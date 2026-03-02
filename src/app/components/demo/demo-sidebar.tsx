@@ -9,7 +9,7 @@ import { CHANNELS, DM_CONTACTS, USERS } from './demo-data';
 interface DemoSidebarProps {
   activeView: ViewId;
   onViewChange: (view: ViewId) => void;
-  isOpen: boolean;
+  isOpen: boolean | null;
   onToggle: () => void;
 }
 
@@ -50,11 +50,16 @@ export default function DemoSidebar({
   isOpen,
   onToggle,
 }: DemoSidebarProps) {
+  const sidebarStateClass =
+    isOpen === null
+      ? 'w-0 border-r-0 md:w-[256px] md:border-r md:border-white/55'
+      : isOpen
+        ? 'w-[256px] border-r border-white/55'
+        : 'w-0 border-r-0';
+
   return (
     <div
-      className={`flex shrink-0 flex-col overflow-hidden border-r border-white/55 bg-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] backdrop-blur-2xl backdrop-saturate-180 transition-[width] duration-200 ${
-        isOpen ? 'w-[256px]' : 'w-0 border-r-0'
-      }`}
+      className={`flex shrink-0 flex-col overflow-hidden bg-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] backdrop-blur-2xl backdrop-saturate-180 transition-[width] duration-200 ${sidebarStateClass}`}
     >
       {/* Traffic light dots + toggle */}
       <div className="flex items-center gap-2 px-3.5 pt-3 pb-1">
@@ -124,7 +129,7 @@ export default function DemoSidebar({
                 {user.isAgent && <span className="text-xs">{'\u{1F916}'}</span>}
                 {user.roleBadge && (
                   <span
-                    className={`ml-auto shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${user.badgeBg} ${user.badgeColor}`}
+                    className={`ml-auto shrink-0 rounded-full px-1.5 py-px text-xs font-medium ${user.badgeBg} ${user.badgeColor}`}
                   >
                     {user.roleBadge}
                   </span>

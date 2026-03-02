@@ -348,8 +348,8 @@ export default function CollaborativeCursors({ enabled }: { enabled: boolean }) 
           <div
             className={`absolute left-3 top-4 whitespace-nowrap rounded-full font-sans-serif text-white ${
               cursor.name === 'You'
-                ? 'px-2.5 py-1 text-xs font-semibold'
-                : 'px-2 py-0.5 text-[11px] font-medium'
+                ? 'px-2.5 py-1 text-sm font-semibold'
+                : 'px-2 py-0.5 text-xs font-medium'
             }`}
             style={{ backgroundColor: cursor.color }}
           >

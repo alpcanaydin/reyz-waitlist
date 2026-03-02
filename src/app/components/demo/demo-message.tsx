@@ -70,7 +70,7 @@ export default function DemoMessage({
           {user.isAgent && <span className="text-xs leading-none">{'\u{1F916}'}</span>}
           {hasAgentBadge && (
             <span
-              className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${user.badgeBg} ${user.badgeColor}`}
+              className={`shrink-0 rounded-full px-1.5 py-px text-xs font-medium ${user.badgeBg} ${user.badgeColor}`}
             >
               {user.roleBadge}
             </span>
@@ -88,7 +88,7 @@ export default function DemoMessage({
             {message.reactions.map((reaction, i) => (
               <span
                 key={reaction.emoji}
-                className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5 text-xs animate-reaction-pop"
+                className="inline-flex items-center gap-1 rounded-full bg-black/4 px-2 py-0.5 text-xs animate-reaction-pop"
                 style={{ animationDelay: `${i * 200}ms` }}
               >
                 {reaction.emoji} {reactionCounts[i] ?? reaction.users.length}
@@ -136,17 +136,17 @@ function CardIcon({ card }: { card: EmbeddedCard }) {
       card.type === 'linear-issue' ? 'Linear' : card.type === 'github-pr' ? 'GitHub' : 'Sentry';
 
     return (
-      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-white ring-1 ring-black/10">
-        <Image src={logoSrc} alt={logoAlt} width={14} height={14} className="h-3.5 w-3.5" />
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white ring-1 ring-black/10">
+        <Image src={logoSrc} alt={logoAlt} width={16} height={16} />
       </div>
     );
   }
   return (
     <div
-      className="flex h-5 w-5 shrink-0 items-center justify-center rounded"
+      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
       style={{ backgroundColor: card.iconColor }}
     >
-      <svg className="h-3 w-3 text-white" viewBox="0 0 16 16" fill="currentColor">
+      <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 16 16" fill="currentColor">
         <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
       </svg>
     </div>

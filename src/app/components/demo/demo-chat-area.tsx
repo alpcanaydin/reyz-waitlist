@@ -15,7 +15,7 @@ interface DemoChatAreaProps {
   shouldAnimate: boolean;
   onAnimationComplete: () => void;
   animationPlayed: boolean;
-  sidebarOpen: boolean;
+  sidebarOpen: boolean | null;
   onOpenSidebar: () => void;
 }
 
@@ -230,16 +230,18 @@ export default function DemoChatArea({
     : `Message ${conversation.headerTitle}`;
   const inputText = isInputTyping ? inputDraft : inputPlaceholder;
   const inputTextClass = isInputTyping ? 'text-sm text-gray-700' : 'text-sm text-gray-400';
+  const showOpenSidebarButton = sidebarOpen !== true;
+  const openSidebarButtonClass = sidebarOpen === null ? 'md:hidden' : '';
 
   return (
     <div ref={chatWindowRef} className="flex flex-1 flex-col bg-white">
       {/* Channel header */}
       <div className="flex shrink-0 items-center gap-2 border-b border-gray-200/50 px-5 py-3">
-        {!sidebarOpen && (
+        {showOpenSidebarButton && (
           <button
             type="button"
             onClick={onOpenSidebar}
-            className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded text-gray-600 transition-colors hover:bg-black/5 hover:text-gray-700"
+            className={`flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded text-gray-600 transition-colors hover:bg-black/5 hover:text-gray-700 ${openSidebarButtonClass}`}
             aria-label="Open sidebar"
           >
             <HugeiconsIcon icon={SidebarRightIcon} size={14} strokeWidth={1.5} />

@@ -14,7 +14,7 @@ export default function ReyzDemoWindow() {
   const [activeView, setActiveView] = useState<ViewId>('developers');
   const [animationPlayed, setAnimationPlayed] = useState(false);
   const [isClearlyVisible, setIsClearlyVisible] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean | null>(null);
 
   const windowRef = useRef<HTMLDivElement>(null);
 
@@ -37,17 +37,17 @@ export default function ReyzDemoWindow() {
   }, []);
 
   return (
-    <div data-hide-cursors className="relative mx-auto hidden max-w-[1200px] px-4 pb-24 md:block">
+    <div data-hide-cursors className="relative mx-auto max-w-[1200px] px-4 pb-24">
       <div
         ref={windowRef}
-        className="flex overflow-hidden rounded-2xl shadow-[0px_18px_90px_0px_rgb(0_0_0/0.18)]"
-        style={{ aspectRatio: '16 / 10', fontFamily: SYSTEM_FONT }}
+        className="flex overflow-hidden rounded-2xl shadow-[0px_18px_90px_0px_rgb(0_0_0/0.18)] aspect-[3/4] md:aspect-[16/10]"
+        style={{ fontFamily: SYSTEM_FONT }}
       >
         <DemoSidebar
           activeView={activeView}
           onViewChange={setActiveView}
           isOpen={sidebarOpen}
-          onToggle={() => setSidebarOpen((o) => !o)}
+          onToggle={() => setSidebarOpen((current) => (current === null ? false : !current))}
         />
         <DemoChatArea
           activeView={activeView}
