@@ -141,30 +141,37 @@ body {
 .demo-liquid-notification {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 0.52);
-  border-radius: 24px;
+  border: 1px solid rgb(255 255 255 / 0.24);
+  border-radius: 14px;
   padding: 16px 18px;
-  background:
-    linear-gradient(
-      180deg,
-      rgb(229 236 248 / 0.72) 0%,
-      rgb(239 244 252 / 0.82) 48%,
-      rgb(255 255 255 / 0.96) 100%
-    ),
-    linear-gradient(135deg, rgb(219 230 245 / 0.5) 0%, rgb(255 255 255 / 0.85) 100%);
+  background-color: rgb(255 255 255 / 0.95);
   box-shadow:
-    0 20px 42px rgb(15 23 42 / 0.16),
-    0 8px 18px rgb(148 163 184 / 0.14),
-    inset 0 1px 0 rgb(255 255 255 / 0.88),
-    inset 0 -1px 0 rgb(255 255 255 / 0.2);
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
+    0 10px 24px rgb(31 38 135 / 0.18),
+    inset 0 1px 0 rgb(255 255 255 / 0.52);
   isolation: isolate;
   animation: liquid-notification-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
   transition:
     transform 220ms ease,
     box-shadow 220ms ease,
-    background 220ms ease;
+    background-color 220ms ease,
+    border-color 220ms ease,
+    backdrop-filter 220ms ease,
+    -webkit-backdrop-filter 220ms ease;
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+  .demo-liquid-notification {
+    background:
+      linear-gradient(
+        180deg,
+        rgb(255 255 255 / 0.5) 0%,
+        rgb(255 255 255 / 0.42) 58%,
+        rgb(255 255 255 / 0.34) 100%
+      ),
+      linear-gradient(135deg, rgb(255 255 255 / 0.18) 0%, rgb(219 230 245 / 0.1) 100%);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+  }
 }
 
 .demo-liquid-notification::before {
@@ -175,26 +182,26 @@ body {
   background:
     linear-gradient(
       180deg,
-      rgb(255 255 255 / 0.46) 0%,
-      rgb(255 255 255 / 0.12) 24%,
-      rgb(255 255 255 / 0) 50%
+      rgb(255 255 255 / 0.62) 0%,
+      rgb(255 255 255 / 0.16) 18%,
+      rgb(255 255 255 / 0) 42%
     ),
-    radial-gradient(circle at top left, rgb(255 255 255 / 0.42), transparent 42%);
+    radial-gradient(circle at top left, rgb(255 255 255 / 0.18), transparent 44%);
   pointer-events: none;
 }
 
 .demo-liquid-notification::after {
   content: '';
   position: absolute;
-  inset: -25% auto -25% -40%;
-  width: 44%;
+  inset: -12% auto -12% -24%;
+  width: 38%;
   background: linear-gradient(
     90deg,
     rgb(255 255 255 / 0),
-    rgb(255 255 255 / 0.6),
+    rgb(255 255 255 / 0.46),
     rgb(255 255 255 / 0)
   );
-  filter: blur(10px);
+  filter: blur(4px);
   opacity: 0;
   pointer-events: none;
   animation: liquid-notification-shimmer 1.35s cubic-bezier(0.19, 1, 0.22, 1) 120ms 1;
@@ -203,24 +210,48 @@ body {
 .demo-liquid-notification:hover,
 .demo-liquid-notification:focus-visible {
   transform: translateY(-2px);
-  background:
-    linear-gradient(
-      180deg,
-      rgb(231 239 251 / 0.5) 0%,
-      rgb(243 248 255 / 0.64) 48%,
-      rgb(255 255 255 / 0.88) 100%
-    ),
-    linear-gradient(135deg, rgb(222 234 249 / 0.34) 0%, rgb(255 255 255 / 0.7) 100%);
+  background-color: rgb(255 255 255 / 0.98);
+  border-color: rgb(255 255 255 / 0.34);
   box-shadow:
-    0 26px 50px rgb(15 23 42 / 0.18),
-    0 10px 22px rgb(148 163 184 / 0.16),
-    inset 0 1px 0 rgb(255 255 255 / 0.92),
-    inset 0 -1px 0 rgb(255 255 255 / 0.24);
+    0 14px 28px rgb(31 38 135 / 0.2),
+    inset 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+  .demo-liquid-notification:hover,
+  .demo-liquid-notification:focus-visible {
+    background:
+      linear-gradient(
+        180deg,
+        rgb(255 255 255 / 0.58) 0%,
+        rgb(255 255 255 / 0.48) 58%,
+        rgb(255 255 255 / 0.4) 100%
+      ),
+      linear-gradient(135deg, rgb(255 255 255 / 0.22) 0%, rgb(219 230 245 / 0.12) 100%);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
 }
 
 .demo-liquid-notification:focus-visible {
   outline: 2px solid rgb(59 130 246 / 0.55);
   outline-offset: 3px;
+}
+
+.demo-notification-sliver {
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+  background-color: rgb(255 255 255 / 0.95);
+  box-shadow: 0 8px 18px rgb(31 38 135 / 0.08);
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+  .demo-notification-sliver {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.3) 100%);
+    backdrop-filter: blur(8px) saturate(170%);
+    -webkit-backdrop-filter: blur(8px) saturate(170%);
+  }
 }
 
 /* Inside the floating stack, suppress the per-card entrance animation and hover lift

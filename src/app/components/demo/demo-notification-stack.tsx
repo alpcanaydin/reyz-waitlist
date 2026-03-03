@@ -50,12 +50,6 @@ export default function DemoNotificationStack({
     return () => observer.disconnect();
   }, [notifications.length]);
 
-  useEffect(() => {
-    if (notifications.length === 0) {
-      setIsDismissing(false);
-    }
-  }, [notifications.length]);
-
   function handleDismiss(e: React.MouseEvent) {
     e.stopPropagation();
     setIsDismissing(true);
@@ -63,6 +57,7 @@ export default function DemoNotificationStack({
 
   function handleDismissAnimationEnd() {
     if (isDismissing) {
+      setIsDismissing(false);
       onDismiss();
     }
   }
@@ -82,7 +77,7 @@ export default function DemoNotificationStack({
             type="button"
             onClick={handleDismiss}
             aria-label={hasMultiple ? 'Clear all notifications' : 'Dismiss notification'}
-            className="group/dismiss flex h-7 items-center rounded-full bg-white/90 px-2 shadow-lg ring-1 ring-black/[0.06] backdrop-blur-sm transition-all duration-150 hover:bg-white hover:shadow-xl"
+            className="group/dismiss flex h-7 items-center rounded-full bg-white/78 px-2 shadow-[0_8px_20px_rgba(31,38,135,0.12)] ring-1 ring-white/65 backdrop-blur-md transition-all duration-150 hover:bg-white/88 hover:shadow-[0_10px_24px_rgba(31,38,135,0.16)]"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
               <path
@@ -124,7 +119,7 @@ export default function DemoNotificationStack({
             return (
               <div
                 key={notification.id}
-                className="absolute rounded-b-3xl border border-t-0 border-white/40 bg-white/90 shadow-sm backdrop-blur-xl transition-[top,left,right] duration-200 ease-out"
+                className="demo-notification-sliver absolute transition-[top,left,right] duration-200 ease-out"
                 style={sliverStyle}
               />
             );
@@ -144,7 +139,7 @@ export default function DemoNotificationStack({
                 className="demo-liquid-notification pointer-events-auto block w-full text-left focus-visible:outline-none"
               >
                 {hiddenCount > 0 && (
-                  <span className="absolute right-3 top-3 rounded-full bg-white/55 px-2 py-0.5 text-xs font-semibold tracking-tight text-slate-700 shadow-[0_6px_18px_rgba(148,163,184,0.14)]">
+                  <span className="absolute right-3 top-3 rounded-full bg-white/46 px-2 py-0.5 text-xs font-semibold tracking-tight text-slate-700 shadow-[0_6px_18px_rgba(31,38,135,0.12)] ring-1 ring-white/55">
                     +{hiddenCount} more
                   </span>
                 )}
@@ -159,7 +154,7 @@ export default function DemoNotificationStack({
                           <span className="ml-1 text-sm leading-none">{'\u{1F916}'}</span>
                         )}
                       </span>
-                      <span className="rounded-full bg-white/45 px-2 py-0.5 text-sm font-semibold leading-none text-slate-500">
+                      <span className="rounded-full bg-white/38 px-2 py-0.5 text-sm font-semibold leading-none text-slate-500 ring-1 ring-white/45">
                         # developers
                       </span>
                       <span className="ml-auto shrink-0 text-xs font-medium text-slate-500/90">
