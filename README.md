@@ -2,6 +2,31 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Create your local environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Set these values in `.env.local`:
+
+```bash
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key
+GOOGLE_SERVICE_ACCOUNT_EMAIL=waitlist-writer@your-project-id.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
+GOOGLE_SHEETS_SHEET_NAME=Waitlist
+```
+
+Waitlist setup:
+
+- Create a Cloudflare Turnstile widget in `Invisible` mode and copy its site key and secret key.
+- Enable the Google Sheets API in Google Cloud.
+- Create a service account and a JSON key, then copy `client_email` and `private_key` into the matching env vars.
+- Create the target spreadsheet, add a `Waitlist` tab, and share the spreadsheet with the service account email as `Editor`.
+- Copy the spreadsheet ID from the sheet URL into `GOOGLE_SHEETS_SPREADSHEET_ID`.
+
 First, run the development server:
 
 ```bash

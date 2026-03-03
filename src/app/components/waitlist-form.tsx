@@ -232,7 +232,7 @@ export default function WaitlistForm({ className, dark }: Props) {
       className={twMerge('flex items-center justify-center px-4', className)}
       noValidate
     >
-      <div className="w-full max-w-[28rem]">
+      <div className="w-full max-w-md">
         <div
           className={twMerge(
             'flex h-14 items-center rounded-full border border-ink/10 bg-white/60 backdrop-blur-sm pl-5 pr-1.5',
