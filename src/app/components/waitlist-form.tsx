@@ -216,8 +216,8 @@ export default function WaitlistForm({ className, dark }: Props) {
     return (
       <p
         className={twMerge(
-          'text-center text-lg text-white/70 font-sans-serif',
-          dark ? 'text-white/60' : 'text-white/70',
+          'text-center text-lg font-sans-serif',
+          dark ? 'text-white/60' : 'text-ink/70',
           className,
         )}
       >
