@@ -110,3 +110,154 @@ body {
 @utility animate-section-reveal {
   animation: section-reveal 700ms ease-out forwards;
 }
+
+/* Floating demo notifications */
+
+@keyframes liquid-notification-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes liquid-notification-shimmer {
+  0% {
+    transform: translate3d(-120%, 0, 0) rotate(14deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: translate3d(190%, 0, 0) rotate(14deg);
+    opacity: 0;
+  }
+}
+
+.demo-liquid-notification {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.52);
+  border-radius: 24px;
+  padding: 16px 18px;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(229 236 248 / 0.72) 0%,
+      rgb(239 244 252 / 0.82) 48%,
+      rgb(255 255 255 / 0.96) 100%
+    ),
+    linear-gradient(135deg, rgb(219 230 245 / 0.5) 0%, rgb(255 255 255 / 0.85) 100%);
+  box-shadow:
+    0 20px 42px rgb(15 23 42 / 0.16),
+    0 8px 18px rgb(148 163 184 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.88),
+    inset 0 -1px 0 rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  isolation: isolate;
+  animation: liquid-notification-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.demo-liquid-notification::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.46) 0%,
+      rgb(255 255 255 / 0.12) 24%,
+      rgb(255 255 255 / 0) 50%
+    ),
+    radial-gradient(circle at top left, rgb(255 255 255 / 0.42), transparent 42%);
+  pointer-events: none;
+}
+
+.demo-liquid-notification::after {
+  content: '';
+  position: absolute;
+  inset: -25% auto -25% -40%;
+  width: 44%;
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0),
+    rgb(255 255 255 / 0.6),
+    rgb(255 255 255 / 0)
+  );
+  filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  animation: liquid-notification-shimmer 1.35s cubic-bezier(0.19, 1, 0.22, 1) 120ms 1;
+}
+
+.demo-liquid-notification:hover,
+.demo-liquid-notification:focus-visible {
+  transform: translateY(-2px);
+  background:
+    linear-gradient(
+      180deg,
+      rgb(231 239 251 / 0.5) 0%,
+      rgb(243 248 255 / 0.64) 48%,
+      rgb(255 255 255 / 0.88) 100%
+    ),
+    linear-gradient(135deg, rgb(222 234 249 / 0.34) 0%, rgb(255 255 255 / 0.7) 100%);
+  box-shadow:
+    0 26px 50px rgb(15 23 42 / 0.18),
+    0 10px 22px rgb(148 163 184 / 0.16),
+    inset 0 1px 0 rgb(255 255 255 / 0.92),
+    inset 0 -1px 0 rgb(255 255 255 / 0.24);
+}
+
+.demo-liquid-notification:focus-visible {
+  outline: 2px solid rgb(59 130 246 / 0.55);
+  outline-offset: 3px;
+}
+
+/* Inside the floating stack, suppress the per-card entrance animation and hover lift
+   so the stack doesn't jump when a new notification arrives or when hovering the dismiss button. */
+.demo-notification-stack .demo-liquid-notification {
+  animation: none;
+}
+
+.demo-notification-stack .demo-liquid-notification:hover,
+.demo-notification-stack .demo-liquid-notification:focus-visible {
+  transform: none;
+}
+
+/* Dismiss animation: shrink + slide up + fade out */
+@keyframes notification-dismiss {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.88) translateY(-16px);
+  }
+}
+
+.demo-notification-stack.is-dismissing {
+  animation: notification-dismiss 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-liquid-notification,
+  .demo-liquid-notification::after {
+    animation: none;
+  }
+
+  .demo-notification-stack.is-dismissing {
+    animation-duration: 0ms;
+  }
+}

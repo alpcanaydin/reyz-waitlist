@@ -20,9 +20,11 @@ interface DemoChatAreaProps {
   activeView: ViewId;
   shouldAnimate: boolean;
   onAnimationComplete: () => void;
+  onDevelopersBackgroundMessage: (message: AnimatedMessage) => void;
   onDevelopersUnreadCountChange: (count: number) => void;
   animationPlayed: boolean;
   sidebarOpen: boolean | null;
+  scrollToBottomRequestId: number;
   onOpenSidebar: () => void;
 }
 
@@ -30,9 +32,11 @@ export default function DemoChatArea({
   activeView,
   shouldAnimate,
   onAnimationComplete,
+  onDevelopersBackgroundMessage,
   onDevelopersUnreadCountChange,
   animationPlayed,
   sidebarOpen,
+  scrollToBottomRequestId,
   onOpenSidebar,
 }: DemoChatAreaProps) {
   const [displayedView, setDisplayedView] = useState<ViewId>(activeView);
@@ -53,8 +57,10 @@ export default function DemoChatArea({
   const currentAnimatedIndexRef = useRef(0);
   const deferredFinalMessageRunnerRef = useRef<(() => void) | null>(null);
   const inputBarRef = useRef<HTMLDivElement>(null);
+  const lastHandledScrollRequestIdRef = useRef(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const onAnimationCompleteRef = useRef(onAnimationComplete);
+  const onDevelopersBackgroundMessageRef = useRef(onDevelopersBackgroundMessage);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // View switching with fade
@@ -98,7 +104,8 @@ export default function DemoChatArea({
   useEffect(() => {
     activeViewRef.current = activeView;
     onAnimationCompleteRef.current = onAnimationComplete;
-  }, [activeView, onAnimationComplete]);
+    onDevelopersBackgroundMessageRef.current = onDevelopersBackgroundMessage;
+  }, [activeView, onAnimationComplete, onDevelopersBackgroundMessage]);
 
   useEffect(() => {
     onDevelopersUnreadCountChange(developersUnreadCount);
@@ -151,12 +158,20 @@ export default function DemoChatArea({
       return timer;
     };
 
-    const revealMessage = (messageIndex: number, countAsUnread: boolean) => {
+    const revealMessage = (
+      messageIndex: number,
+      message: AnimatedMessage,
+      countAsUnread: boolean,
+    ) => {
       currentAnimatedIndexRef.current = messageIndex + 1;
       setVisibleAnimatedCount(currentAnimatedIndexRef.current);
 
       if (countAsUnread) {
         setDevelopersUnreadCount((count) => count + 1);
+      }
+
+      if (message.userId !== 'you') {
+        onDevelopersBackgroundMessageRef.current(message);
       }
     };
 
@@ -188,7 +203,7 @@ export default function DemoChatArea({
             () => {
               setIsInputTyping(false);
               setInputDraft('');
-              revealMessage(messageIndex, false);
+              revealMessage(messageIndex, message, false);
               schedule(showNext, scaleDelay(message.pauseAfter, 220));
             },
             scaleDelay(220, 140),
@@ -235,7 +250,7 @@ export default function DemoChatArea({
         () => {
           // Phase 2: Reveal message
           setTypingUserId(null);
-          revealMessage(messageIndex, activeViewRef.current !== 'developers');
+          revealMessage(messageIndex, message, activeViewRef.current !== 'developers');
 
           // Phase 3: Pause then next
           schedule(showNext, scaleDelay(message.pauseAfter, 220));
@@ -259,6 +274,27 @@ export default function DemoChatArea({
       scrollContainerRef.current.scrollTop = 0;
     }
   }, [displayedView]);
+
+  useEffect(() => {
+    if (
+      scrollToBottomRequestId === 0 ||
+      scrollToBottomRequestId === lastHandledScrollRequestIdRef.current
+    ) {
+      return;
+    }
+
+    if (displayedView !== 'developers') return;
+
+    lastHandledScrollRequestIdRef.current = scrollToBottomRequestId;
+
+    const frame = requestAnimationFrame(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      container.scrollTop = container.scrollHeight;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [displayedView, scrollToBottomRequestId]);
 
   // Keep viewport following incoming simulation content.
   useEffect(() => {

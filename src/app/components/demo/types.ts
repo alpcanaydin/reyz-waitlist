@@ -18,6 +18,14 @@ export interface ConversationView {
   animatedMessages?: AnimatedMessage[];
 }
 
+export interface DeveloperNotification {
+  id: string;
+  messageId: string;
+  userId: string;
+  text: string;
+  timestamp: string;
+}
+
 export interface DirectMessageContact {
   id: DmId;
   userId: string;
