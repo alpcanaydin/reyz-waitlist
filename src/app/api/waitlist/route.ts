@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { randomInt } from 'node:crypto';
 
 import { appendWaitlistRow } from '@/src/lib/google-sheets';
 import { verifyTurnstileToken } from '@/src/lib/turnstile';
@@ -10,6 +11,43 @@ import {
 } from '@/src/lib/waitlist';
 
 export const runtime = 'nodejs';
+
+const TICKET_CODE_ALPHABET = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+] as const;
+const TICKET_CODE_LENGTH = 8;
+const TICKET_CODE_PREFIX = 'REYZ';
 
 interface WaitlistRequestPayload {
   email?: unknown;
@@ -46,12 +84,16 @@ export async function POST(request: Request) {
       return createErrorResponse(waitlistErrorCodes.captchaFailed, 400);
     }
 
+    const submittedAtUtc = new Date().toISOString();
+    const ticketCode = generateTicketCode();
+
     await appendWaitlistRow({
       email,
-      submittedAtUtc: new Date().toISOString(),
+      submittedAtUtc,
+      ticketCode,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ email, ok: true, ticketCode });
   } catch (error) {
     console.error('Waitlist signup failed', error);
 
@@ -61,6 +103,16 @@ export async function POST(request: Request) {
 
 function createErrorResponse(error: WaitlistErrorCode, status: number) {
   return NextResponse.json({ error }, { status });
+}
+
+function generateTicketCode(): string {
+  let codeBody = '';
+
+  for (let index = 0; index < TICKET_CODE_LENGTH; index += 1) {
+    codeBody += TICKET_CODE_ALPHABET[randomInt(TICKET_CODE_ALPHABET.length)]!;
+  }
+
+  return `${TICKET_CODE_PREFIX}-${codeBody.slice(0, 4)}-${codeBody.slice(4)}`;
 }
 
 function getRequestIp(request: Request): string | undefined {

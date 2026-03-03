@@ -22,6 +22,8 @@ export type WaitlistResponse = WaitlistErrorResponse | WaitlistSuccessResponse;
 
 export interface WaitlistSuccessResponse {
   ok: true;
+  email: string;
+  ticketCode: string;
 }
 
 const WAITLIST_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
@@ -38,6 +40,20 @@ export function isWaitlistErrorResponse(payload: unknown): payload is WaitlistEr
   const candidate = payload as Partial<WaitlistErrorResponse>;
 
   return typeof candidate.error === 'string';
+}
+
+export function isWaitlistSuccessResponse(payload: unknown): payload is WaitlistSuccessResponse {
+  if (!payload || typeof payload !== 'object') {
+    return false;
+  }
+
+  const candidate = payload as Partial<WaitlistSuccessResponse>;
+
+  return (
+    candidate.ok === true &&
+    typeof candidate.email === 'string' &&
+    typeof candidate.ticketCode === 'string'
+  );
 }
 
 export function normalizeWaitlistEmail(email: string): string {

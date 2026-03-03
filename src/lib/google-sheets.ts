@@ -32,19 +32,21 @@ let cachedToken: null | TokenCache = null;
 export async function appendWaitlistRow({
   email,
   submittedAtUtc,
+  ticketCode,
 }: {
   email: string;
   submittedAtUtc: string;
+  ticketCode: string;
 }): Promise<void> {
   const config = getGoogleServiceAccountConfig();
   const accessToken = await getGoogleAccessToken();
-  const range = encodeURIComponent(`${config.sheetName}!A:B`);
+  const range = encodeURIComponent(`${config.sheetName}!A:C`);
   const response = await fetch(
     `${GOOGLE_SHEETS_API_BASE_URL}/${config.spreadsheetId}/values/${range}:append?${GOOGLE_SHEETS_APPEND_QUERY}`,
     {
       body: JSON.stringify({
         majorDimension: 'ROWS',
-        values: [[submittedAtUtc, email]],
+        values: [[submittedAtUtc, email, ticketCode]],
       }),
       cache: 'no-store',
       headers: {

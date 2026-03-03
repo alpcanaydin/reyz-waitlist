@@ -319,3 +319,329 @@ body {
     animation-duration: 0ms;
   }
 }
+
+/* Waitlist success experience */
+
+@keyframes waitlist-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes waitlist-overlay-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+
+@keyframes waitlist-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes waitlist-ticket-in {
+  0% {
+    opacity: 0;
+    transform: translateY(42px) scale(0.965);
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes waitlist-field-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes waitlist-orb-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -5%, 0) scale(1.05);
+  }
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(0.98);
+  }
+}
+
+@keyframes waitlist-grid-pan {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(36px);
+  }
+}
+
+@keyframes waitlist-badge-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.waitlist-success-overlay {
+  background:
+    radial-gradient(circle at top, rgb(255 176 138 / 0.18), transparent 34%),
+    radial-gradient(circle at 80% 18%, rgb(244 212 151 / 0.16), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgb(248 239 225 / 0.1), transparent 28%),
+    linear-gradient(180deg, rgb(18 19 23 / 0.96), rgb(18 19 23));
+  animation: waitlist-overlay-in 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+
+.waitlist-success-overlay--exiting {
+  animation: waitlist-overlay-out 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.waitlist-success-copy {
+  animation: waitlist-copy-in 640ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+
+.waitlist-success-ticket-shell {
+  animation: waitlist-ticket-in 760ms cubic-bezier(0.2, 0.95, 0.2, 1.02) 220ms both;
+}
+
+.waitlist-success-field {
+  opacity: 0;
+  animation: waitlist-field-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.waitlist-success-field--delay-1 {
+  animation-delay: 360ms;
+}
+
+.waitlist-success-field--delay-2 {
+  animation-delay: 420ms;
+}
+
+.waitlist-success-field--delay-3 {
+  animation-delay: 500ms;
+}
+
+.waitlist-success-field--delay-4 {
+  animation-delay: 580ms;
+}
+
+.waitlist-success-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(16px);
+  opacity: 0.95;
+  animation: waitlist-orb-drift 8s ease-in-out infinite alternate;
+}
+
+.waitlist-success-orb--one {
+  inset: -14% auto auto -10%;
+  width: min(34rem, 48vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(255 170 136 / 0.22) 0%, transparent 72%);
+}
+
+.waitlist-success-orb--two {
+  inset: auto -8% -20% auto;
+  width: min(38rem, 54vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(245 226 170 / 0.16) 0%, transparent 72%);
+  animation-duration: 10s;
+}
+
+.waitlist-success-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-position: center;
+  background-size: 120px 120px;
+  mask-image: linear-gradient(180deg, transparent, black 20%, black 80%, transparent);
+  opacity: 0.16;
+  animation: waitlist-grid-pan 8s linear infinite alternate;
+}
+
+.waitlist-success-confetti {
+  opacity: 0.78;
+  filter: saturate(0.95);
+  mix-blend-mode: screen;
+}
+
+.waitlist-success-close-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.waitlist-ticket {
+  --ticket-notch-radius: 22px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.52);
+  border-radius: 32px;
+  background:
+    linear-gradient(180deg, rgb(251 247 241) 0%, rgb(245 238 228) 100%),
+    linear-gradient(135deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0));
+  -webkit-mask:
+    radial-gradient(circle var(--ticket-notch-radius) at 0 50%, transparent 97%, #000 100%) 0
+      50% / 51% 100% no-repeat,
+    radial-gradient(circle var(--ticket-notch-radius) at 100% 50%, transparent 97%, #000 100%)
+      100% 50% / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--ticket-notch-radius) at 0 50%, transparent 97%, #000 100%) 0
+      50% / 51% 100% no-repeat,
+    radial-gradient(circle var(--ticket-notch-radius) at 100% 50%, transparent 97%, #000 100%)
+      100% 50% / 51% 100% no-repeat;
+  box-shadow:
+    0 30px 120px rgb(0 0 0 / 0.36),
+    0 0 0 1px rgb(255 255 255 / 0.18),
+    inset 0 1px 0 rgb(255 255 255 / 0.7);
+  isolation: isolate;
+}
+
+.waitlist-ticket::after {
+  pointer-events: none;
+}
+
+.waitlist-ticket::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.32), transparent 18%),
+    radial-gradient(circle at top left, rgb(255 214 177 / 0.16), transparent 34%);
+  opacity: 0.85;
+}
+
+.waitlist-ticket::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 24px;
+  opacity: 0.3;
+}
+
+.waitlist-ticket::selection {
+  background: rgb(18 19 23 / 0.14);
+}
+
+.waitlist-ticket__meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.waitlist-ticket__stub,
+.waitlist-ticket__series {
+  border: 1px solid rgb(0 0 0 / 0.08);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgb(255 255 255 / 0.36);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgb(0 0 0 / 0.46);
+}
+
+.waitlist-ticket__series {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.56), rgb(255 255 255 / 0.24)),
+    linear-gradient(120deg, rgb(255 214 177 / 0.16), transparent 80%);
+}
+
+.waitlist-ticket__header {
+  padding-bottom: 18px;
+}
+
+.waitlist-ticket__perforation {
+  position: relative;
+  height: 18px;
+  margin-bottom: 18px;
+}
+
+.waitlist-ticket__perforation::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(var(--ticket-notch-radius) + 6px);
+  right: calc(var(--ticket-notch-radius) + 6px);
+  border-top: 1px dashed rgb(0 0 0 / 0.18);
+  transform: translateY(-50%);
+}
+
+.waitlist-ticket__perforation::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(var(--ticket-notch-radius) + 12px);
+  right: calc(var(--ticket-notch-radius) + 12px);
+  height: 8px;
+  background: radial-gradient(circle, rgb(0 0 0 / 0.12) 1px, transparent 1.2px) left center /
+    12px 8px repeat-x;
+  opacity: 0.7;
+  transform: translateY(-50%);
+}
+
+.waitlist-ticket__mini-panel {
+  border: 1px solid rgb(0 0 0 / 0.08);
+  border-radius: 20px;
+  padding: 12px 15px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.68), rgb(255 255 255 / 0.22)),
+    linear-gradient(120deg, rgb(255 199 168 / 0.12), transparent 70%);
+}
+
+.waitlist-settled-badge {
+  animation: waitlist-badge-in 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waitlist-success-overlay,
+  .waitlist-success-overlay--exiting,
+  .waitlist-success-copy,
+  .waitlist-success-ticket-shell,
+  .waitlist-success-field,
+  .waitlist-success-orb,
+  .waitlist-success-grid,
+  .waitlist-settled-badge {
+    animation: none;
+  }
+
+  .waitlist-success-field {
+    opacity: 1;
+    transform: none;
+  }
+}
