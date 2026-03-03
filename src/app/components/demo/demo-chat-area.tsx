@@ -4,16 +4,23 @@ import { ArrowUp02Icon, SidebarRightIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useEffect, useRef, useState } from 'react';
 
-import type { ViewId } from './types';
+import type { AnimatedMessage, ViewId } from './types';
 
 import { CONVERSATIONS, USERS } from './demo-data';
 import DemoMessage from './demo-message';
 import DemoTypingIndicator from './demo-typing-indicator';
 
+const DEVELOPERS_ANIMATED_MESSAGES = CONVERSATIONS.developers.animatedMessages ?? [];
+const FINAL_DEVELOPERS_SELF_MESSAGE_INDEX = DEVELOPERS_ANIMATED_MESSAGES.reduce<number>(
+  (lastIndex, message, index) => (message.userId === 'you' ? index : lastIndex),
+  -1,
+);
+
 interface DemoChatAreaProps {
   activeView: ViewId;
   shouldAnimate: boolean;
   onAnimationComplete: () => void;
+  onDevelopersUnreadCountChange: (count: number) => void;
   animationPlayed: boolean;
   sidebarOpen: boolean | null;
   onOpenSidebar: () => void;
@@ -23,6 +30,7 @@ export default function DemoChatArea({
   activeView,
   shouldAnimate,
   onAnimationComplete,
+  onDevelopersUnreadCountChange,
   animationPlayed,
   sidebarOpen,
   onOpenSidebar,
@@ -36,16 +44,23 @@ export default function DemoChatArea({
   const [inputInView, setInputInView] = useState(false);
   const [isInputTyping, setIsInputTyping] = useState(false);
   const [startRunId, setStartRunId] = useState(0);
+  const [developersUnreadCount, setDevelopersUnreadCount] = useState(0);
+  const [deferredFinalMessageIndex, setDeferredFinalMessageIndex] = useState<null | number>(null);
 
   const hasStartedRef = useRef(false);
+  const activeViewRef = useRef(activeView);
   const chatWindowRef = useRef<HTMLDivElement>(null);
+  const currentAnimatedIndexRef = useRef(0);
+  const deferredFinalMessageRunnerRef = useRef<(() => void) | null>(null);
   const inputBarRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const onAnimationCompleteRef = useRef(onAnimationComplete);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // View switching with fade
   useEffect(() => {
     if (activeView === displayedView) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Demo view fade is intentionally driven by view changes.
     setFading(true);
     const id = setTimeout(() => {
       setDisplayedView(activeView);
@@ -76,23 +91,55 @@ export default function DemoChatArea({
     if (!shouldAnimate || !inputInView || animationPlayed || hasStartedRef.current) return;
 
     hasStartedRef.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- The one-time animation run starts from this gate.
     setStartRunId((runId) => runId + 1);
   }, [displayedView, shouldAnimate, inputInView, animationPlayed]);
+
+  useEffect(() => {
+    activeViewRef.current = activeView;
+    onAnimationCompleteRef.current = onAnimationComplete;
+  }, [activeView, onAnimationComplete]);
+
+  useEffect(() => {
+    onDevelopersUnreadCountChange(developersUnreadCount);
+  }, [developersUnreadCount, onDevelopersUnreadCountChange]);
+
+  useEffect(() => {
+    if (activeView !== 'developers') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Unread should clear immediately when developers is opened.
+    setDevelopersUnreadCount((count) => (count === 0 ? count : 0));
+  }, [activeView]);
+
+  useEffect(() => {
+    if (deferredFinalMessageIndex === null || displayedView !== 'developers') return;
+
+    const resumeDeferredFinalMessage = deferredFinalMessageRunnerRef.current;
+    if (!resumeDeferredFinalMessage) return;
+
+    deferredFinalMessageRunnerRef.current = null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Resuming consumes the deferred final message in the same transition.
+    setDeferredFinalMessageIndex(null);
+    resumeDeferredFinalMessage();
+  }, [deferredFinalMessageIndex, displayedView]);
 
   // Dedicated simulation runner. It does not depend on viewport gates after start.
   useEffect(() => {
     if (startRunId === 0) return;
 
-    const animated = CONVERSATIONS.developers.animatedMessages;
-    if (!animated?.length) return;
+    if (!DEVELOPERS_ANIMATED_MESSAGES.length) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Each run resets the demo simulation state before timers start.
     setVisibleAnimatedCount(0);
     setShowReactions(false);
     setTypingUserId(null);
     setInputDraft('');
     setIsInputTyping(false);
+    setDevelopersUnreadCount(0);
+    setDeferredFinalMessageIndex(null);
 
-    let currentIndex = 0;
+    currentAnimatedIndexRef.current = 0;
+    deferredFinalMessageRunnerRef.current = null;
+
     const timers = new Set<ReturnType<typeof setTimeout>>();
     const scaleDelay = (delay: number, minimum = 0) => Math.max(minimum, Math.round(delay * 0.84));
     const schedule = (fn: () => void, delay: number) => {
@@ -104,11 +151,31 @@ export default function DemoChatArea({
       return timer;
     };
 
-    const composeOwnMessage = (text: string, pauseAfter: number, typingDuration: number) => {
+    const revealMessage = (messageIndex: number, countAsUnread: boolean) => {
+      currentAnimatedIndexRef.current = messageIndex + 1;
+      setVisibleAnimatedCount(currentAnimatedIndexRef.current);
+
+      if (countAsUnread) {
+        setDevelopersUnreadCount((count) => count + 1);
+      }
+    };
+
+    const finishSimulation = () => {
+      setTypingUserId(null);
+      schedule(
+        () => {
+          setShowReactions(true);
+          onAnimationCompleteRef.current();
+        },
+        scaleDelay(500, 260),
+      );
+    };
+
+    const composeOwnMessage = (messageIndex: number, message: AnimatedMessage) => {
       let charIndex = 0;
       const perCharDelay = Math.max(
         14,
-        Math.floor(scaleDelay(typingDuration, 240) / Math.max(text.length, 1)),
+        Math.floor(scaleDelay(message.typingDuration, 240) / Math.max(message.text.length, 1)),
       );
 
       setTypingUserId(null);
@@ -116,14 +183,13 @@ export default function DemoChatArea({
       setInputDraft('');
 
       const typeNextCharacter = () => {
-        if (charIndex >= text.length) {
+        if (charIndex >= message.text.length) {
           schedule(
             () => {
               setIsInputTyping(false);
               setInputDraft('');
-              currentIndex++;
-              setVisibleAnimatedCount(currentIndex);
-              schedule(showNext, scaleDelay(pauseAfter, 220));
+              revealMessage(messageIndex, false);
+              schedule(showNext, scaleDelay(message.pauseAfter, 220));
             },
             scaleDelay(220, 140),
           );
@@ -131,10 +197,10 @@ export default function DemoChatArea({
         }
 
         charIndex += 1;
-        setInputDraft(text.slice(0, charIndex));
+        setInputDraft(message.text.slice(0, charIndex));
         schedule(
           typeNextCharacter,
-          text[charIndex - 1] === ' ' ? Math.max(14, perCharDelay - 6) : perCharDelay,
+          message.text[charIndex - 1] === ' ' ? Math.max(14, perCharDelay - 6) : perCharDelay,
         );
       };
 
@@ -142,48 +208,50 @@ export default function DemoChatArea({
     };
 
     function showNext() {
-      if (!animated || currentIndex >= animated.length) {
-        setTypingUserId(null);
-        schedule(
-          () => {
-            setShowReactions(true);
-            onAnimationComplete();
-          },
-          scaleDelay(500, 260),
-        );
+      if (currentAnimatedIndexRef.current >= DEVELOPERS_ANIMATED_MESSAGES.length) {
+        finishSimulation();
         return;
       }
 
-      const msg = animated[currentIndex];
+      const messageIndex = currentAnimatedIndexRef.current;
+      const message = DEVELOPERS_ANIMATED_MESSAGES[messageIndex];
+      const isFinalSelfMessage =
+        messageIndex === FINAL_DEVELOPERS_SELF_MESSAGE_INDEX && message.userId === 'you';
 
-      if (msg.userId === 'you') {
-        composeOwnMessage(msg.text, msg.pauseAfter, msg.typingDuration);
+      if (message.userId === 'you') {
+        if (isFinalSelfMessage && activeViewRef.current !== 'developers') {
+          deferredFinalMessageRunnerRef.current = () => composeOwnMessage(messageIndex, message);
+          setDeferredFinalMessageIndex(messageIndex);
+          return;
+        }
+
+        composeOwnMessage(messageIndex, message);
         return;
       }
 
       // Phase 1: Show typing indicator
-      setTypingUserId(msg.userId);
+      setTypingUserId(message.userId);
       schedule(
         () => {
           // Phase 2: Reveal message
           setTypingUserId(null);
-          currentIndex++;
-          setVisibleAnimatedCount(currentIndex);
+          revealMessage(messageIndex, activeViewRef.current !== 'developers');
 
           // Phase 3: Pause then next
-          schedule(showNext, scaleDelay(msg.pauseAfter, 220));
+          schedule(showNext, scaleDelay(message.pauseAfter, 220));
         },
-        scaleDelay(msg.typingDuration, 260),
+        scaleDelay(message.typingDuration, 260),
       );
     }
 
     schedule(showNext, scaleDelay(160, 90));
 
     return () => {
+      deferredFinalMessageRunnerRef.current = null;
       timers.forEach((timer) => clearTimeout(timer));
       timers.clear();
     };
-  }, [startRunId, onAnimationComplete]);
+  }, [startRunId]);
 
   // Reset scroll on view switch
   useEffect(() => {
@@ -205,6 +273,7 @@ export default function DemoChatArea({
     visibleAnimatedCount,
     typingUserId,
     showReactions,
+    deferredFinalMessageIndex,
     animationPlayed,
     startRunId,
   ]);
@@ -222,14 +291,16 @@ export default function DemoChatArea({
       : [];
 
   const shouldShowReactions = animationPlayed || showReactions;
-  const typingUser = typingUserId ? USERS[typingUserId] : null;
+  const showLiveDevelopersState = isDevelopers;
+  const typingUser = showLiveDevelopersState && typingUserId ? USERS[typingUserId] : null;
 
   // Input placeholder text
   const inputPlaceholder = displayedView.startsWith('dm-')
     ? `Message ${conversation.headerTitle}`
     : `Message ${conversation.headerTitle}`;
-  const inputText = isInputTyping ? inputDraft : inputPlaceholder;
-  const inputTextClass = isInputTyping ? 'text-sm text-gray-700' : 'text-sm text-gray-400';
+  const showInputDraft = showLiveDevelopersState && isInputTyping;
+  const inputText = showInputDraft ? inputDraft : inputPlaceholder;
+  const inputTextClass = showInputDraft ? 'text-sm text-gray-700' : 'text-sm text-gray-400';
   const showOpenSidebarButton = sidebarOpen !== true;
   const openSidebarButtonClass = sidebarOpen === null ? 'md:hidden' : '';
 
@@ -333,7 +404,7 @@ export default function DemoChatArea({
           <div className="flex items-center gap-2 pt-3">
             <span className={`flex min-h-[20px] flex-1 items-center leading-5 ${inputTextClass}`}>
               {inputText}
-              {isInputTyping && (
+              {showInputDraft && (
                 <span className="ml-1 inline-block h-3.5 w-px animate-pulse bg-gray-500 align-middle" />
               )}
             </span>

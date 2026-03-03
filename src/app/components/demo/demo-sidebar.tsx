@@ -8,6 +8,7 @@ import { CHANNELS, DM_CONTACTS, USERS } from './demo-data';
 
 interface DemoSidebarProps {
   activeView: ViewId;
+  developersUnreadCount: number;
   onViewChange: (view: ViewId) => void;
   isOpen: boolean | null;
   onToggle: () => void;
@@ -46,6 +47,7 @@ const MENU_ITEMS = [
 
 export default function DemoSidebar({
   activeView,
+  developersUnreadCount,
   onViewChange,
   isOpen,
   onToggle,
@@ -100,16 +102,29 @@ export default function DemoSidebar({
         {/* Channels */}
         <SectionLabel className="mt-2 mb-1">Channels</SectionLabel>
         <div className="flex flex-col gap-px">
-          {CHANNELS.map((channel) => (
-            <SidebarItem
-              key={channel.id}
-              active={activeView === channel.id}
-              onClick={() => onViewChange(channel.id)}
-            >
-              <span className="font-mono text-xs">#</span>
-              <span className="truncate">{channel.name}</span>
-            </SidebarItem>
-          ))}
+          {CHANNELS.map((channel) => {
+            const showUnreadBadge =
+              channel.id === 'developers' &&
+              developersUnreadCount > 0 &&
+              activeView !== 'developers';
+            const unreadLabel = developersUnreadCount > 99 ? '99+' : `${developersUnreadCount}`;
+
+            return (
+              <SidebarItem
+                key={channel.id}
+                active={activeView === channel.id}
+                onClick={() => onViewChange(channel.id)}
+              >
+                <span className="font-mono text-xs">#</span>
+                <span className="min-w-0 flex-1 truncate">{channel.name}</span>
+                {showUnreadBadge && (
+                  <span className="ml-auto shrink-0 rounded-full bg-gray-900 px-1.5 py-px text-[11px] font-semibold text-white">
+                    {unreadLabel}
+                  </span>
+                )}
+              </SidebarItem>
+            );
+          })}
         </div>
 
         {/* Direct Messages */}
@@ -125,7 +140,7 @@ export default function DemoSidebar({
                 onClick={() => onViewChange(viewId)}
               >
                 <UserAvatar userId={dm.userId} size="xs" />
-                <span className="truncate">{user.name}</span>
+                <span className="min-w-0 flex-1 truncate">{user.name}</span>
                 {user.isAgent && <span className="text-xs">{'\u{1F916}'}</span>}
                 {user.roleBadge && (
                   <span

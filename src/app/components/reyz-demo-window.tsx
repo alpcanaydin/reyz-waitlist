@@ -13,6 +13,7 @@ const SYSTEM_FONT =
 export default function ReyzDemoWindow() {
   const [activeView, setActiveView] = useState<ViewId>('developers');
   const [animationPlayed, setAnimationPlayed] = useState(false);
+  const [developersUnreadCount, setDevelopersUnreadCount] = useState(0);
   const [isClearlyVisible, setIsClearlyVisible] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean | null>(null);
 
@@ -45,6 +46,7 @@ export default function ReyzDemoWindow() {
       >
         <DemoSidebar
           activeView={activeView}
+          developersUnreadCount={developersUnreadCount}
           onViewChange={setActiveView}
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen((current) => (current === null ? false : !current))}
@@ -53,6 +55,7 @@ export default function ReyzDemoWindow() {
           activeView={activeView}
           shouldAnimate={isClearlyVisible && !animationPlayed}
           onAnimationComplete={() => setAnimationPlayed(true)}
+          onDevelopersUnreadCountChange={setDevelopersUnreadCount}
           animationPlayed={animationPlayed}
           sidebarOpen={sidebarOpen}
           onOpenSidebar={() => setSidebarOpen(true)}
