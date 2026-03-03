@@ -16,8 +16,9 @@ interface DemoNotificationStackProps {
   onDismiss: () => void;
 }
 
-const SLIVER_HEIGHT = 14;
+const SLIVER_HEIGHT = 10;
 const NARROW_STEP = 10;
+const SLIVER_OVERLAP = 22;
 
 export default function DemoNotificationStack({
   notifications,
@@ -102,25 +103,30 @@ export default function DemoNotificationStack({
         style={{ height: `${stackHeight}px` }}
         onAnimationEnd={handleDismissAnimationEnd}
       >
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
+          <div
+            className="demo-notification-ambient demo-notification-ambient--card absolute inset-x-0 top-0"
+            style={{ height: `${topCardHeight}px` }}
+          />
+          {visibleNotifications.slice(1).map((notification, index) => (
+            <div
+              key={`ambient-${notification.id}`}
+              className="demo-notification-ambient demo-notification-ambient--sliver absolute transition-[top,left,right] duration-200 ease-out"
+              style={getSliverStyle(index + 1, topCardHeight, visibleNotifications.length)}
+            />
+          ))}
+        </div>
+
         {visibleNotifications.map((notification, index) => {
           const user = USERS[notification.userId];
           const isTopCard = index === 0;
 
           if (!isTopCard) {
-            const insetX = index * NARROW_STEP;
-            const sliverStyle: CSSProperties = {
-              top: `${topCardHeight + (index - 1) * SLIVER_HEIGHT}px`,
-              left: `${insetX}px`,
-              right: `${insetX}px`,
-              height: `${SLIVER_HEIGHT}px`,
-              zIndex: visibleNotifications.length - index,
-            };
-
             return (
               <div
                 key={notification.id}
                 className="demo-notification-sliver absolute transition-[top,left,right] duration-200 ease-out"
-                style={sliverStyle}
+                style={getSliverStyle(index, topCardHeight, visibleNotifications.length)}
               />
             );
           }
@@ -139,7 +145,7 @@ export default function DemoNotificationStack({
                 className="demo-liquid-notification pointer-events-auto block w-full text-left focus-visible:outline-none"
               >
                 {hiddenCount > 0 && (
-                  <span className="absolute right-3 top-3 rounded-full bg-white/46 px-2 py-0.5 text-xs font-semibold tracking-tight text-slate-700 shadow-[0_6px_18px_rgba(31,38,135,0.12)] ring-1 ring-white/55">
+                  <span className="absolute right-3 top-3 rounded-full bg-white/46 px-2 py-0.5 text-xs font-semibold tracking-tight text-slate-700 shadow-[0_6px_18px_rgba(31,38,135,0.12)] ring-1 ring-white/55 backdrop-blur-sm">
                     +{hiddenCount} more
                   </span>
                 )}
@@ -154,7 +160,7 @@ export default function DemoNotificationStack({
                           <span className="ml-1 text-sm leading-none">{'\u{1F916}'}</span>
                         )}
                       </span>
-                      <span className="rounded-full bg-white/38 px-2 py-0.5 text-sm font-semibold leading-none text-slate-500 ring-1 ring-white/45">
+                      <span className="rounded-full bg-white/38 px-2 py-0.5 text-sm font-semibold leading-none text-slate-500 ring-1 ring-white/45 backdrop-blur-sm">
                         # developers
                       </span>
                       <span className="ml-auto shrink-0 text-xs font-medium text-slate-500/90">
@@ -210,4 +216,17 @@ function Avatar({ notification }: { notification: DeveloperNotification }) {
       {label[0]}
     </div>
   );
+}
+
+function getSliverStyle(index: number, topCardHeight: number, visibleCount: number): CSSProperties {
+  const insetX = index * NARROW_STEP;
+
+  return {
+    // Tuck the stack layers under the large bottom radius of the lead card.
+    top: `${topCardHeight - SLIVER_OVERLAP + (index - 1) * SLIVER_HEIGHT}px`,
+    left: `${insetX}px`,
+    right: `${insetX}px`,
+    height: `${SLIVER_HEIGHT + SLIVER_OVERLAP}px`,
+    zIndex: visibleCount - index,
+  };
 }
