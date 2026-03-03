@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import type { DeveloperNotification } from './types';
@@ -18,7 +18,8 @@ interface DemoNotificationStackProps {
 
 const SLIVER_HEIGHT = 10;
 const NARROW_STEP = 10;
-const SLIVER_OVERLAP = 22;
+const AMBIENT_SLIVER_OVERLAP = 22;
+const SLIVER_CARD_OVERLAP = 12;
 
 export default function DemoNotificationStack({
   notifications,
@@ -27,11 +28,29 @@ export default function DemoNotificationStack({
 }: DemoNotificationStackProps) {
   const [topCardHeight, setTopCardHeight] = useState(124);
   const [isDismissing, setIsDismissing] = useState(false);
+  const [relativeTime, setRelativeTime] = useState('just now');
+  const arrivedAtRef = useRef(0);
   const topCardRef = useRef<HTMLDivElement>(null);
   const portalTarget = typeof document === 'undefined' ? null : document.body;
   const visibleNotifications = notifications.slice(-3).reverse();
-  const hiddenCount = Math.max(0, notifications.length - visibleNotifications.length);
   const hasMultiple = notifications.length > 1;
+
+  const formatRelative = useCallback((ms: number) => {
+    const s = Math.floor(ms / 1000);
+    if (s < 2) return 'just now';
+    if (s < 60) return `${s}s ago`;
+    const m = Math.floor(s / 60);
+    return `${m}m ago`;
+  }, []);
+
+  const topNotificationId = visibleNotifications[0]?.id;
+  useEffect(() => {
+    arrivedAtRef.current = performance.now();
+    const tick = setInterval(() => {
+      setRelativeTime(formatRelative(performance.now() - arrivedAtRef.current));
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [topNotificationId, formatRelative]);
 
   const behindCount = Math.max(0, visibleNotifications.length - 1);
   const stackHeight = topCardHeight + behindCount * SLIVER_HEIGHT;
@@ -73,24 +92,24 @@ export default function DemoNotificationStack({
     >
       {/* Dismiss / Clear All button */}
       {!isDismissing && (
-        <div className="pointer-events-auto absolute -left-1 -top-1 z-50 translate-x-2 opacity-0 transition-all duration-200 ease-out group-hover/stack:translate-x-0 group-hover/stack:opacity-100 md:-left-2 md:-top-2">
+        <div className="pointer-events-auto absolute -left-0.5 -top-0.5 z-50 translate-x-2 opacity-0 transition-all duration-200 ease-out group-hover/stack:translate-x-0 group-hover/stack:opacity-100 md:-left-1 md:-top-1">
           <button
             type="button"
             onClick={handleDismiss}
             aria-label={hasMultiple ? 'Clear all notifications' : 'Dismiss notification'}
-            className="group/dismiss flex h-7 items-center rounded-full bg-white/78 px-2 shadow-[0_8px_20px_rgba(31,38,135,0.12)] ring-1 ring-white/65 backdrop-blur-md transition-all duration-150 hover:bg-white/88 hover:shadow-[0_10px_24px_rgba(31,38,135,0.16)]"
+            className="group/dismiss flex h-6 items-center rounded-full bg-white/78 px-[5px] shadow-[0_8px_20px_rgba(31,38,135,0.12)] ring-1 ring-white/65 backdrop-blur-md transition-all duration-150 hover:bg-white/88 hover:shadow-[0_10px_24px_rgba(31,38,135,0.16)]"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
               <path
                 d="M4 4l6 6M10 4l-6 6"
                 stroke="currentColor"
-                strokeWidth="1.75"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 className="text-slate-500"
               />
             </svg>
             {hasMultiple && (
-              <span className="inline-block max-w-0 overflow-hidden whitespace-nowrap text-xs font-semibold text-slate-600 opacity-0 transition-all duration-200 ease-out group-hover/dismiss:ml-1.5 group-hover/dismiss:mr-0.5 group-hover/dismiss:max-w-[80px] group-hover/dismiss:opacity-100">
+              <span className="inline-block max-w-0 overflow-hidden whitespace-nowrap text-xs font-medium text-slate-600 opacity-0 transition-all duration-200 ease-out group-hover/dismiss:ml-1 group-hover/dismiss:mr-0.5 group-hover/dismiss:max-w-[80px] group-hover/dismiss:opacity-100">
                 Clear All
               </span>
             )}
@@ -105,14 +124,14 @@ export default function DemoNotificationStack({
       >
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
           <div
-            className="demo-notification-ambient demo-notification-ambient--card absolute inset-x-0 top-0"
+            className="demo-notification-ambient demo-notification-ambient--card absolute inset-x-0 top-0 backdrop-blur-xs backdrop-saturate-125"
             style={{ height: `${topCardHeight}px` }}
           />
           {visibleNotifications.slice(1).map((notification, index) => (
             <div
               key={`ambient-${notification.id}`}
-              className="demo-notification-ambient demo-notification-ambient--sliver absolute transition-[top,left,right] duration-200 ease-out"
-              style={getSliverStyle(index + 1, topCardHeight, visibleNotifications.length)}
+              className="demo-notification-ambient demo-notification-ambient--bridge absolute backdrop-blur-xs backdrop-saturate-125 transition-[top,left,right] duration-200 ease-out"
+              style={getAmbientBridgeStyle(index + 1, topCardHeight, visibleNotifications.length)}
             />
           ))}
         </div>
@@ -126,7 +145,12 @@ export default function DemoNotificationStack({
               <div
                 key={notification.id}
                 className="demo-notification-sliver absolute transition-[top,left,right] duration-200 ease-out"
-                style={getSliverStyle(index, topCardHeight, visibleNotifications.length)}
+                style={getSliverStyle(
+                  index,
+                  topCardHeight,
+                  visibleNotifications.length,
+                  SLIVER_CARD_OVERLAP,
+                )}
               />
             );
           }
@@ -144,12 +168,6 @@ export default function DemoNotificationStack({
                 aria-label={`Open developers and jump to the latest message from ${user?.name ?? notification.userId}`}
                 className="demo-liquid-notification pointer-events-auto block w-full text-left focus-visible:outline-none"
               >
-                {hiddenCount > 0 && (
-                  <span className="absolute right-3 top-3 rounded-full bg-white/46 px-2 py-0.5 text-xs font-semibold tracking-tight text-slate-700 shadow-[0_6px_18px_rgba(31,38,135,0.12)] ring-1 ring-white/55 backdrop-blur-sm">
-                    +{hiddenCount} more
-                  </span>
-                )}
-
                 <div className="flex items-start gap-3">
                   <Avatar notification={notification} />
                   <div className="min-w-0 flex-1">
@@ -160,11 +178,11 @@ export default function DemoNotificationStack({
                           <span className="ml-1 text-sm leading-none">{'\u{1F916}'}</span>
                         )}
                       </span>
-                      <span className="rounded-full bg-white/38 px-2 py-0.5 text-sm font-semibold leading-none text-slate-500 ring-1 ring-white/45 backdrop-blur-sm">
-                        # developers
+                      <span className="text-sm font-semibold leading-none text-slate-700">
+                        #developers
                       </span>
-                      <span className="ml-auto shrink-0 text-xs font-medium text-slate-500/90">
-                        {notification.timestamp}
+                      <span className="ml-auto shrink-0 text-xs font-medium text-slate-500">
+                        {relativeTime}
                       </span>
                     </div>
 
@@ -218,15 +236,35 @@ function Avatar({ notification }: { notification: DeveloperNotification }) {
   );
 }
 
-function getSliverStyle(index: number, topCardHeight: number, visibleCount: number): CSSProperties {
+function getAmbientBridgeStyle(
+  index: number,
+  topCardHeight: number,
+  visibleCount: number,
+): CSSProperties {
   const insetX = index * NARROW_STEP;
 
   return {
-    // Tuck the stack layers under the large bottom radius of the lead card.
-    top: `${topCardHeight - SLIVER_OVERLAP + (index - 1) * SLIVER_HEIGHT}px`,
+    top: `${topCardHeight - AMBIENT_SLIVER_OVERLAP + (index - 1) * SLIVER_HEIGHT}px`,
     left: `${insetX}px`,
     right: `${insetX}px`,
-    height: `${SLIVER_HEIGHT + SLIVER_OVERLAP}px`,
+    height: `${AMBIENT_SLIVER_OVERLAP + 2}px`,
+    zIndex: visibleCount - index,
+  };
+}
+
+function getSliverStyle(
+  index: number,
+  topCardHeight: number,
+  visibleCount: number,
+  overlap = 0,
+): CSSProperties {
+  const insetX = index * NARROW_STEP;
+
+  return {
+    top: `${topCardHeight - overlap + (index - 1) * SLIVER_HEIGHT}px`,
+    left: `${insetX}px`,
+    right: `${insetX}px`,
+    height: `${SLIVER_HEIGHT + overlap}px`,
     zIndex: visibleCount - index,
   };
 }
