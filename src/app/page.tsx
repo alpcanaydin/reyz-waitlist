@@ -42,7 +42,7 @@ export default function Home() {
       {ready && (
         <>
           {/* Gradient bridge: WebGL background fades to white */}
-          <div className="relative h-48 bg-linear-to-b from-transparent to-white pointer-events-none" />
+          <div className="relative h-24 bg-linear-to-b from-transparent to-white pointer-events-none" />
           <div className="animate-section-reveal">
             <IntroSection />
             <SeatSection />

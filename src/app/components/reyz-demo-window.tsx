@@ -79,7 +79,7 @@ export default function ReyzDemoWindow() {
   }
 
   return (
-    <div data-hide-cursors className="relative mx-auto max-w-[1200px] px-4 pb-24">
+    <div className="relative mx-auto max-w-[1200px] px-4 pb-12">
       <DemoNotificationStack
         notifications={developerNotifications}
         onOpen={handleNotificationOpen}
@@ -87,6 +87,7 @@ export default function ReyzDemoWindow() {
       />
       <div
         ref={windowRef}
+        data-hide-cursors
         className="flex overflow-hidden rounded-2xl shadow-[0px_18px_90px_0px_rgb(0_0_0/0.18)] aspect-[3/4] md:aspect-[16/10]"
         style={{ fontFamily: SYSTEM_FONT }}
       >
